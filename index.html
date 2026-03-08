@@ -58,7 +58,7 @@
           <div class="collapse navbar-collapse" id="drmsNav">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1">
               <li class="nav-item"><a class="nav-link active" href="#" data-section="home"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-              <li class="nav-item"><a class="nav-link" href="#" data-section="stock"><i class="bi bi-box-seam me-2"></i>Stock</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" data-section="stock"><i class="bi bi-box-seam me-2"></i>Stock Balance Report</a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-section="distribution"><i class="bi bi-truck me-2"></i>Distribution</a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-section="impact"><i class="bi bi-bar-chart-line me-2"></i>Impact</a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-section="about"><i class="bi bi-info-circle me-2"></i>About</a></li>
@@ -151,8 +151,17 @@
         <div id="section-stock" class="dashboard-section d-none">
           <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
-              <h2 class="h4 mb-3"><i class="bi bi-box-seam me-2"></i>Stock Balance Report</h2>
-              <div id="stock-content" class="report-grid"></div>
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                <h2 class="h4 mb-0"><i class="bi bi-box-seam me-2"></i>Stock Balance Report</h2>
+                <button id="stock-download-btn" type="button" class="btn btn-primary">
+                  <i class="bi bi-file-earmark-pdf me-2"></i>Download PDF
+                </button>
+              </div>
+              <div id="stock-loading" class="d-none text-center py-4">
+                <div class="spinner-border text-primary" role="status" aria-label="Loading stock balance"></div>
+                <p class="text-muted mt-3 mb-0">Loading stock balance data...</p>
+              </div>
+              <div id="stock-content"></div>
             </div>
           </div>
         </div>
