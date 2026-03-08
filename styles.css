@@ -8,6 +8,37 @@ body {
   background-color: var(--drms-bg);
   color: #1f2d3d;
   font-size: 0.98rem;
+  cursor: default;
+}
+
+a,
+button,
+.btn,
+[role='button'] {
+  cursor: pointer;
+}
+
+input,
+textarea,
+select,
+input[type='search'] {
+  cursor: text;
+  caret-color: auto;
+}
+
+div,
+section,
+article,
+nav,
+.card,
+.table-responsive,
+table,
+thead,
+tbody,
+tr,
+td,
+th {
+  caret-color: transparent;
 }
 
 #login-view {
