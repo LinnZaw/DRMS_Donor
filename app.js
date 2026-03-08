@@ -155,6 +155,23 @@ async function loadDistributionReport() {
   }
 }
 
+async function loadDistributionReport() {
+  const container = document.getElementById('distribution-content');
+  container.innerHTML = '';
+  showDistributionLoading(true);
+
+  try {
+    const responseData = await apiGet('/distribution');
+    const distributionRecords = responseData?.data?.distributionRecords;
+    renderDistributionTable(container, Array.isArray(distributionRecords) ? distributionRecords : []);
+  } catch (error) {
+    showGlobalAlert(error.message || 'Unable to fetch distribution report data.');
+    container.innerHTML = '<p class="text-muted mb-0">No distribution records available.</p>';
+  } finally {
+    showDistributionLoading(false);
+  }
+}
+
 async function apiGet(path) {
   const response = await fetch(`${API_BASE}${path}`, {
     method: 'GET',
@@ -184,7 +201,7 @@ function renderStockTable(container, records) {
   const rows = records
     .map((record) => `
       <tr>
-        <td>${escapeHtml(String(record.stockBalanceId ?? ''))}</td>
+        <td>${escapeHtml(String(record.id ?? ''))}</td>
         <td>${escapeHtml(formatDate(record.createdDate))}</td>
         <td>${escapeHtml(String(record.type ?? ''))}</td>
         <td>${escapeHtml(String(record.itemDescription ?? ''))}</td>
@@ -192,7 +209,7 @@ function renderStockTable(container, records) {
         <td>${escapeHtml(String(record.itemName ?? ''))}</td>
         <td>${escapeHtml(String(record.storageLocation ?? ''))}</td>
         <td>${escapeHtml(formatDate(record.manufacturedDate))}</td>
-        <td>${escapeHtml(formatDate(record.expiredDate))}</td>
+        <td>${escapeHtml(formatDate(record.expiriedDate))}</td>
       </tr>
     `)
     .join('');
