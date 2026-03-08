@@ -8,6 +8,8 @@ const loginButton = document.getElementById('login-btn');
 const globalAlert = document.getElementById('global-alert');
 const globalSpinner = document.getElementById('global-spinner');
 const logoutLink = document.getElementById('logout-link');
+const stockDownloadButton = document.getElementById('stock-download-btn');
+const stockLoading = document.getElementById('stock-loading');
 
 const sectionMap = {
   home: document.getElementById('section-home'),
@@ -21,7 +23,6 @@ const navLinks = Array.from(document.querySelectorAll('[data-section]'));
 const quickLinks = Array.from(document.querySelectorAll('[data-quick-section]'));
 
 const hasLoadedSection = {
-  stock: false,
   distribution: false,
   impact: false
 };
@@ -60,7 +61,6 @@ loginForm.addEventListener('submit', async (event) => {
     showDashboard();
     switchSection('home');
     loginForm.reset();
-
   } catch (error) {
     showLoginError(error.message || 'Unable to login. Please try again.');
   } finally {
@@ -83,6 +83,8 @@ quickLinks.forEach((button) => {
     switchSection(button.dataset.quickSection);
   });
 });
+
+stockDownloadButton.addEventListener('click', downloadStockPdf);
 
 logoutLink.addEventListener('click', (event) => {
   event.preventDefault();
@@ -116,9 +118,8 @@ async function switchSection(section) {
 
   hideGlobalAlert();
 
-  if (section === 'stock' && !hasLoadedSection.stock) {
-    hasLoadedSection.stock = true;
-    await loadReport('stock-balance', 'stock-content', 'No stock records available.');
+  if (section === 'stock') {
+    await loadStockBalance();
   }
 
   if (section === 'distribution' && !hasLoadedSection.distribution) {
@@ -129,6 +130,23 @@ async function switchSection(section) {
   if (section === 'impact' && !hasLoadedSection.impact) {
     hasLoadedSection.impact = true;
     await loadReport('impact-overview', 'impact-content', 'No impact metrics available.');
+  }
+}
+
+async function loadStockBalance() {
+  const container = document.getElementById('stock-content');
+  container.innerHTML = '';
+  showStockLoading(true);
+
+  try {
+    const responseData = await apiGet('/stocks');
+    const stockRecords = responseData?.data?.stockInfos;
+    renderStockTable(container, Array.isArray(stockRecords) ? stockRecords : []);
+  } catch (error) {
+    showGlobalAlert(error.message || 'Unable to fetch stock balance data.');
+    container.innerHTML = '<p class="text-muted mb-0">No stock balance records available.</p>';
+  } finally {
+    showStockLoading(false);
   }
 }
 
@@ -166,6 +184,80 @@ async function apiGet(path) {
   }
 
   return response.json();
+}
+
+function renderStockTable(container, records) {
+  if (!records.length) {
+    container.innerHTML = '<p class="text-muted mb-0">No stock balance records available.</p>';
+    return;
+  }
+
+  const rows = records
+    .map((record) => `
+      <tr>
+        <td>${escapeHtml(String(record.stockBalanceId ?? ''))}</td>
+        <td>${escapeHtml(formatDate(record.createdDate))}</td>
+        <td>${escapeHtml(String(record.type ?? ''))}</td>
+        <td>${escapeHtml(String(record.itemDescription ?? ''))}</td>
+        <td>${escapeHtml(String(record.quantity ?? ''))}</td>
+        <td>${escapeHtml(String(record.itemName ?? ''))}</td>
+        <td>${escapeHtml(String(record.storageLocation ?? ''))}</td>
+        <td>${escapeHtml(formatDate(record.manufacturedDate))}</td>
+        <td>${escapeHtml(formatDate(record.expiredDate))}</td>
+      </tr>
+    `)
+    .join('');
+
+  container.innerHTML = `
+    <div class="table-responsive">
+      <table class="table table-striped table-hover table-bordered mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Stock Balance ID</th>
+            <th>Reported Date</th>
+            <th>Type</th>
+            <th>Item Description</th>
+            <th>Quantity</th>
+            <th>Item Name</th>
+            <th>Storage Location</th>
+            <th>Manufactured Date</th>
+            <th>Expired Date</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+async function downloadStockPdf() {
+  stockDownloadButton.disabled = true;
+  stockDownloadButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Downloading...';
+
+  try {
+    const response = await fetch(`${API_BASE}/stocks/stock-pdf`, {
+      method: 'GET'
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to download PDF (${response.status}).`);
+    }
+
+    const blob = await response.blob();
+    const fileUrl = URL.createObjectURL(blob);
+    const tempLink = document.createElement('a');
+    tempLink.href = fileUrl;
+    tempLink.download = 'Stock-Balance-Report.pdf';
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    tempLink.remove();
+    URL.revokeObjectURL(fileUrl);
+  } catch (error) {
+    showGlobalAlert(error.message || 'Unable to download stock balance report PDF.');
+  } finally {
+    stockDownloadButton.disabled = false;
+    stockDownloadButton.innerHTML = '<i class="bi bi-file-earmark-pdf me-2"></i>Download PDF';
+  }
 }
 
 function renderReport(container, data, emptyMessage) {
@@ -206,11 +298,29 @@ function normalizeToEntries(data) {
   return [['Value', data]];
 }
 
+function formatDate(value) {
+  if (!value) return '';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+
+  return date.toISOString().slice(0, 10);
+}
+
 function toLabel(key) {
   return key
     .replace(/([A-Z])/g, ' $1')
     .replace(/[_-]/g, ' ')
     .replace(/^./, (char) => char.toUpperCase());
+}
+
+function escapeHtml(value) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
 function showLoginError(message) {
@@ -232,18 +342,13 @@ function showSpinner(show) {
   globalSpinner.classList.toggle('d-none', !show);
 }
 
+function showStockLoading(show) {
+  stockLoading.classList.toggle('d-none', !show);
+}
+
 function setButtonLoading(isLoading) {
   loginButton.disabled = isLoading;
   loginButton.innerHTML = isLoading
     ? '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...'
     : '<span class="btn-text">Login</span>';
-}
-
-function escapeHtml(text) {
-  return text
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
 }
