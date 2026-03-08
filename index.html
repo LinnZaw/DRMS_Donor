@@ -59,7 +59,7 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1">
               <li class="nav-item"><a class="nav-link active" href="#" data-section="home"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-section="stock"><i class="bi bi-box-seam me-2"></i>Stock Balance Report</a></li>
-              <li class="nav-item"><a class="nav-link" href="#" data-section="distribution"><i class="bi bi-truck me-2"></i>Distribution</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" data-section="distribution"><i class="bi bi-truck me-2"></i>Distribution Report</a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-section="impact"><i class="bi bi-bar-chart-line me-2"></i>Impact</a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-section="about"><i class="bi bi-info-circle me-2"></i>About</a></li>
               <li class="nav-item"><a class="nav-link" href="#" id="logout-link"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
@@ -169,8 +169,17 @@
         <div id="section-distribution" class="dashboard-section d-none">
           <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
-              <h2 class="h4 mb-3"><i class="bi bi-truck me-2"></i>Distribution Report</h2>
-              <div id="distribution-content" class="report-grid"></div>
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                <h2 class="h4 mb-0"><i class="bi bi-truck me-2"></i>Distribution Report</h2>
+                <button id="distribution-download-btn" type="button" class="btn btn-primary">
+                  <i class="bi bi-file-earmark-pdf me-2"></i>Download PDF
+                </button>
+              </div>
+              <div id="distribution-loading" class="d-none text-center py-4">
+                <div class="spinner-border text-primary" role="status" aria-label="Loading distribution report"></div>
+                <p class="text-muted mt-3 mb-0">Loading distribution data...</p>
+              </div>
+              <div id="distribution-content"></div>
             </div>
           </div>
         </div>
