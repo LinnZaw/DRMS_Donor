@@ -57,8 +57,6 @@ loginForm.addEventListener('submit', async (event) => {
       throw new Error('Invalid email or password.');
     }
 
-    await response.json();
-
     showDashboard();
     switchSection('home');
     loginForm.reset();
@@ -88,7 +86,6 @@ quickLinks.forEach((button) => {
 
 logoutLink.addEventListener('click', (event) => {
   event.preventDefault();
-
   Object.keys(hasLoadedSection).forEach((key) => {
     hasLoadedSection[key] = false;
   });
@@ -160,6 +157,11 @@ async function apiGet(path) {
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      showLogin();
+      throw new Error('Session expired. Please login again.');
+    }
+
     throw new Error(`Failed to load data (${response.status}).`);
   }
 
