@@ -1,5 +1,4 @@
 const API_BASE = 'http://localhost:8080/api';
-const TOKEN_KEY = 'drmsAuthToken';
 
 const loginView = document.getElementById('login-view');
 const dashboardView = document.getElementById('dashboard-view');
@@ -28,13 +27,7 @@ const hasLoadedSection = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  const token = localStorage.getItem(TOKEN_KEY);
-  if (token) {
-    showDashboard();
-    switchSection('home');
-  } else {
-    showLogin();
-  }
+  showLogin();
 });
 
 loginForm.addEventListener('submit', async (event) => {
@@ -64,14 +57,6 @@ loginForm.addEventListener('submit', async (event) => {
       throw new Error('Invalid email or password.');
     }
 
-    const payload = await response.json();
-    const token = payload.token || payload.accessToken || payload.jwt;
-
-    if (!token) {
-      throw new Error('Login succeeded but token was not provided by API.');
-    }
-
-    localStorage.setItem(TOKEN_KEY, token);
     showDashboard();
     switchSection('home');
     loginForm.reset();
@@ -100,7 +85,6 @@ quickLinks.forEach((button) => {
 
 logoutLink.addEventListener('click', (event) => {
   event.preventDefault();
-  localStorage.removeItem(TOKEN_KEY);
   Object.keys(hasLoadedSection).forEach((key) => {
     hasLoadedSection[key] = false;
   });
@@ -165,19 +149,15 @@ async function loadReport(endpoint, containerId, emptyMessage) {
 }
 
 async function apiGet(path) {
-  const token = localStorage.getItem(TOKEN_KEY);
-
   const response = await fetch(`${API_BASE}${path}`, {
     method: 'GET',
     headers: {
-      Authorization: token ? `Bearer ${token}` : '',
       'Content-Type': 'application/json'
     }
   });
 
   if (!response.ok) {
     if (response.status === 401) {
-      localStorage.removeItem(TOKEN_KEY);
       showLogin();
       throw new Error('Session expired. Please login again.');
     }
