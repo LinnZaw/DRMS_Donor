@@ -133,36 +133,6 @@ th {
   --bs-btn-hover-border-color: var(--drms-primary-dark);
 }
 
-.report-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.9rem;
-}
-
-.report-item {
-  background: #fff;
-  border: 1px solid #e7eef8;
-  border-radius: 0.85rem;
-  padding: 0.95rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.report-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0.65rem 1.2rem rgba(31, 72, 110, 0.08);
-}
-
-.report-item .label {
-  color: #6c7a89;
-  font-size: 0.85rem;
-}
-
-.report-item .value {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-top: 0.15rem;
-}
-
 * {
   scrollbar-width: thin;
   scrollbar-color: #8bc3ff #edf4ff;

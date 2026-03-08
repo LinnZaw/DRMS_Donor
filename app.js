@@ -6,7 +6,6 @@ const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
 const loginButton = document.getElementById('login-btn');
 const globalAlert = document.getElementById('global-alert');
-const globalSpinner = document.getElementById('global-spinner');
 const logoutLink = document.getElementById('logout-link');
 const stockDownloadButton = document.getElementById('stock-download-btn');
 const stockLoading = document.getElementById('stock-loading');
@@ -17,16 +16,11 @@ const sectionMap = {
   home: document.getElementById('section-home'),
   stock: document.getElementById('section-stock'),
   distribution: document.getElementById('section-distribution'),
-  impact: document.getElementById('section-impact'),
   about: document.getElementById('section-about')
 };
 
 const navLinks = Array.from(document.querySelectorAll('[data-section]'));
 const quickLinks = Array.from(document.querySelectorAll('[data-quick-section]'));
-
-const hasLoadedSection = {
-  impact: false
-};
 
 document.addEventListener('DOMContentLoaded', () => {
   sanitizeEditableBehavior();
@@ -92,10 +86,6 @@ distributionDownloadButton.addEventListener('click', downloadDistributionPdf);
 
 logoutLink.addEventListener('click', (event) => {
   event.preventDefault();
-  Object.keys(hasLoadedSection).forEach((key) => {
-    hasLoadedSection[key] = false;
-  });
-
   showLogin();
 });
 
@@ -129,11 +119,6 @@ async function switchSection(section) {
   if (section === 'distribution') {
     await loadDistributionReport();
   }
-
-  if (section === 'impact' && !hasLoadedSection.impact) {
-    hasLoadedSection.impact = true;
-    await loadReport('impact-overview', 'impact-content', 'No impact metrics available.');
-  }
 }
 
 async function loadStockBalance() {
@@ -153,19 +138,20 @@ async function loadStockBalance() {
   }
 }
 
-async function loadReport(endpoint, containerId, emptyMessage) {
-  const container = document.getElementById(containerId);
+async function loadDistributionReport() {
+  const container = document.getElementById('distribution-content');
   container.innerHTML = '';
-  showSpinner(true);
+  showDistributionLoading(true);
 
   try {
-    const reportData = await apiGet(`/reports/${endpoint}`);
-    renderReport(container, reportData, emptyMessage);
+    const responseData = await apiGet('/distribution');
+    const distributionRecords = responseData?.data?.distributionRecords;
+    renderDistributionTable(container, Array.isArray(distributionRecords) ? distributionRecords : []);
   } catch (error) {
-    showGlobalAlert(error.message || 'Unable to fetch report data.');
-    container.innerHTML = `<p class="text-muted mb-0">${emptyMessage}</p>`;
+    showGlobalAlert(error.message || 'Unable to fetch distribution report data.');
+    container.innerHTML = '<p class="text-muted mb-0">No distribution records available.</p>';
   } finally {
-    showSpinner(false);
+    showDistributionLoading(false);
   }
 }
 
@@ -348,7 +334,7 @@ function renderDistributionTable(container, records) {
             <th>No. of Disabled</th>
             <th>Location Name</th>
             <th>Distributed Items</th>
-            <th>Field Staff</th>
+            <th>Field Staff Name</th>
             <th>Distributed Date</th>
           </tr>
         </thead>
@@ -358,44 +344,6 @@ function renderDistributionTable(container, records) {
   `;
 }
 
-function renderReport(container, data, emptyMessage) {
-  const entries = normalizeToEntries(data);
-
-  if (!entries.length) {
-    container.innerHTML = `<p class="text-muted mb-0">${emptyMessage}</p>`;
-    return;
-  }
-
-  container.innerHTML = entries
-    .map(([label, value]) => `
-      <article class="report-item">
-        <div class="label">${escapeHtml(toLabel(label))}</div>
-        <div class="value">${escapeHtml(String(value))}</div>
-      </article>
-    `)
-    .join('');
-}
-
-function normalizeToEntries(data) {
-  if (!data) return [];
-
-  if (Array.isArray(data)) {
-    if (!data.length) return [];
-
-    if (typeof data[0] === 'object') {
-      return Object.entries(data[0]);
-    }
-
-    return data.map((item, index) => [`Item ${index + 1}`, item]);
-  }
-
-  if (typeof data === 'object') {
-    return Object.entries(data);
-  }
-
-  return [['Value', data]];
-}
-
 function formatDate(value) {
   if (!value) return '';
 
@@ -403,13 +351,6 @@ function formatDate(value) {
   if (Number.isNaN(date.getTime())) return '';
 
   return date.toISOString().slice(0, 10);
-}
-
-function toLabel(key) {
-  return key
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/[_-]/g, ' ')
-    .replace(/^./, (char) => char.toUpperCase());
 }
 
 function escapeHtml(value) {
@@ -434,10 +375,6 @@ function showGlobalAlert(message) {
 function hideGlobalAlert() {
   globalAlert.textContent = '';
   globalAlert.classList.add('d-none');
-}
-
-function showSpinner(show) {
-  globalSpinner.classList.toggle('d-none', !show);
 }
 
 function showStockLoading(show) {
