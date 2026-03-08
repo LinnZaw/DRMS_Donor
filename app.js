@@ -57,9 +57,12 @@ loginForm.addEventListener('submit', async (event) => {
       throw new Error('Invalid email or password.');
     }
 
+    await response.json();
+
     showDashboard();
     switchSection('home');
     loginForm.reset();
+
   } catch (error) {
     showLoginError(error.message || 'Unable to login. Please try again.');
   } finally {
@@ -85,9 +88,11 @@ quickLinks.forEach((button) => {
 
 logoutLink.addEventListener('click', (event) => {
   event.preventDefault();
+
   Object.keys(hasLoadedSection).forEach((key) => {
     hasLoadedSection[key] = false;
   });
+
   showLogin();
 });
 
@@ -103,9 +108,7 @@ function showDashboard() {
 }
 
 async function switchSection(section) {
-  if (!sectionMap[section]) {
-    return;
-  }
+  if (!sectionMap[section]) return;
 
   Object.values(sectionMap).forEach((view) => view.classList.add('d-none'));
   sectionMap[section].classList.remove('d-none');
@@ -157,11 +160,6 @@ async function apiGet(path) {
   });
 
   if (!response.ok) {
-    if (response.status === 401) {
-      showLogin();
-      throw new Error('Session expired. Please login again.');
-    }
-
     throw new Error(`Failed to load data (${response.status}).`);
   }
 
@@ -187,16 +185,12 @@ function renderReport(container, data, emptyMessage) {
 }
 
 function normalizeToEntries(data) {
-  if (!data) {
-    return [];
-  }
+  if (!data) return [];
 
   if (Array.isArray(data)) {
-    if (!data.length) {
-      return [];
-    }
+    if (!data.length) return [];
 
-    if (typeof data[0] === 'object' && data[0] !== null) {
+    if (typeof data[0] === 'object') {
       return Object.entries(data[0]);
     }
 
@@ -239,7 +233,7 @@ function showSpinner(show) {
 function setButtonLoading(isLoading) {
   loginButton.disabled = isLoading;
   loginButton.innerHTML = isLoading
-    ? '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Logging in...'
+    ? '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...'
     : '<span class="btn-text">Login</span>';
 }
 
