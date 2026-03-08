@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRMS Donor Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="min-vh-100 d-flex flex-column">
+    <main id="login-view" class="flex-grow-1 d-flex align-items-center justify-content-center p-3">
+      <div class="card login-card shadow-sm border-0">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <i class="bi bi-heart-pulse-fill text-primary fs-1"></i>
+            <h1 class="h4 mt-2 mb-1">DRMS Donor Login</h1>
+            <p class="text-muted mb-0">Sign in to access disaster relief updates</p>
+          </div>
+
+          <div id="login-error" class="alert alert-danger py-2 d-none" role="alert"></div>
+
+          <form id="login-form" novalidate>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input id="email" name="email" type="email" class="form-control" placeholder="name@example.com" required />
+            </div>
+            <div class="mb-4">
+              <label for="password" class="form-label">Password</label>
+              <input id="password" name="password" type="password" class="form-control" placeholder="Enter password" required />
+            </div>
+            <button id="login-btn" type="submit" class="btn btn-primary w-100">
+              <span class="btn-text">Login</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="dashboard-view" class="d-none flex-column min-vh-100">
+      <nav class="navbar navbar-expand-lg navbar-dark drms-navbar sticky-top shadow-sm">
+        <div class="container-fluid px-3 px-lg-4">
+          <a class="navbar-brand fw-semibold" href="#" data-section="home">
+            <i class="bi bi-droplet-half me-2"></i>DRMS Donor
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#drmsNav" aria-controls="drmsNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="drmsNav">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li class="nav-item"><a class="nav-link active" href="#" data-section="home">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" data-section="stock">Stock Balance Report</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" data-section="distribution">Distribution Report</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" data-section="impact">Impact Overview</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" data-section="about">About DRMS</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="logout-link">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <section class="container py-4 py-md-5 flex-grow-1">
+        <div id="global-alert" class="alert alert-danger d-none" role="alert"></div>
+
+        <div id="global-spinner" class="d-none text-center my-5">
+          <div class="spinner-border text-primary" role="status" aria-label="Loading"></div>
+          <p class="text-muted mt-3 mb-0">Loading latest data...</p>
+        </div>
+
+        <div id="section-home" class="dashboard-section">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4 p-md-5">
+              <h2 class="h3 mb-3">Welcome to the DRMS Donor Dashboard</h2>
+              <p class="text-muted mb-4">The Disaster Relief Management System (DRMS) coordinates humanitarian support to ensure rapid, transparent, and equitable aid distribution to affected communities. This dashboard helps donors monitor stock availability, distribution progress, and impact data in one place.</p>
+              <div class="d-flex flex-column flex-md-row gap-3">
+                <button class="btn btn-primary btn-lg px-4" data-quick-section="stock">
+                  <i class="bi bi-box-seam me-2"></i>View Stock Balance Report
+                </button>
+                <button class="btn btn-outline-primary btn-lg px-4" data-quick-section="distribution">
+                  <i class="bi bi-truck me-2"></i>View Distribution Report
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-stock" class="dashboard-section d-none">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <h2 class="h4 mb-3"><i class="bi bi-box-seam me-2"></i>Stock Balance Report</h2>
+              <div id="stock-content" class="report-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-distribution" class="dashboard-section d-none">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <h2 class="h4 mb-3"><i class="bi bi-truck me-2"></i>Distribution Report</h2>
+              <div id="distribution-content" class="report-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-impact" class="dashboard-section d-none">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <h2 class="h4 mb-3"><i class="bi bi-bar-chart-line me-2"></i>Impact Overview</h2>
+              <div id="impact-content" class="report-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-about" class="dashboard-section d-none">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <h2 class="h4 mb-3"><i class="bi bi-info-circle me-2"></i>About DRMS</h2>
+              <p class="mb-2">DRMS is a humanitarian response platform designed to support emergency logistics, donor accountability, and data-driven relief planning.</p>
+              <p class="mb-0">By connecting donors, volunteers, and field teams, DRMS helps ensure aid reaches communities quickly and transparently during disaster events.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="app.js"></script>
+</body>
+</html>

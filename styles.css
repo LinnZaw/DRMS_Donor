@@ -1,0 +1,87 @@
+:root {
+  --drms-primary: #4da6ff;
+  --drms-bg: #f5f9ff;
+}
+
+body {
+  background-color: var(--drms-bg);
+  color: #1f2d3d;
+}
+
+.drms-navbar {
+  background-color: var(--drms-primary);
+}
+
+.navbar .nav-link {
+  border-radius: 0.35rem;
+  transition: background-color 0.2s ease;
+}
+
+.navbar .nav-link.active,
+.navbar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.login-card {
+  max-width: 430px;
+  width: 100%;
+}
+
+.text-primary,
+.btn-primary,
+.btn-outline-primary {
+  --bs-primary: var(--drms-primary);
+  --bs-btn-bg: var(--drms-primary);
+  --bs-btn-border-color: var(--drms-primary);
+  --bs-btn-hover-bg: #3d98f4;
+  --bs-btn-hover-border-color: #3d98f4;
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.9rem;
+}
+
+.report-item {
+  background: #fff;
+  border: 1px solid #e7eef8;
+  border-radius: 0.75rem;
+  padding: 0.95rem;
+}
+
+.report-item .label {
+  color: #6c7a89;
+  font-size: 0.85rem;
+}
+
+.report-item .value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 0.15rem;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #8bc3ff #edf4ff;
+}
+
+*::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #8bc3ff;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #edf4ff;
+}
+
+@media (max-width: 575.98px) {
+  .card-body {
+    padding: 1.2rem;
+  }
+}
