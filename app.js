@@ -57,7 +57,6 @@ loginForm.addEventListener('submit', async (event) => {
       throw new Error('Invalid email or password.');
     }
 
-    await response.json();
     showDashboard();
     switchSection('home');
     loginForm.reset();
