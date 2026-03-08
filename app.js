@@ -215,7 +215,7 @@ function renderStockTable(container, records) {
   const rows = records
     .map((record) => `
       <tr>
-        <td>${escapeHtml(String(record.stockBalanceId ?? ''))}</td>
+        <td>${escapeHtml(String(record.id ?? ''))}</td>
         <td>${escapeHtml(formatDate(record.createdDate))}</td>
         <td>${escapeHtml(String(record.type ?? ''))}</td>
         <td>${escapeHtml(String(record.itemDescription ?? ''))}</td>
@@ -223,7 +223,7 @@ function renderStockTable(container, records) {
         <td>${escapeHtml(String(record.itemName ?? ''))}</td>
         <td>${escapeHtml(String(record.storageLocation ?? ''))}</td>
         <td>${escapeHtml(formatDate(record.manufacturedDate))}</td>
-        <td>${escapeHtml(formatDate(record.expiredDate))}</td>
+        <td>${escapeHtml(formatDate(record.expiriedDate))}</td>
       </tr>
     `)
     .join('');
@@ -348,7 +348,7 @@ function renderDistributionTable(container, records) {
             <th>No. of Disabled</th>
             <th>Location Name</th>
             <th>Distributed Items</th>
-            <th>Field Staff Name</th>
+            <th>Field Staff</th>
             <th>Distributed Date</th>
           </tr>
         </thead>
