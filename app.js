@@ -29,6 +29,8 @@ const hasLoadedSection = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  sanitizeEditableBehavior();
+  setupFocusGuard();
   showLogin();
 });
 
@@ -451,4 +453,33 @@ function setButtonLoading(isLoading) {
   loginButton.innerHTML = isLoading
     ? '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...'
     : '<span class="btn-text">Login</span>';
+}
+
+function sanitizeEditableBehavior() {
+  const editableElements = document.querySelectorAll('[contenteditable]');
+  editableElements.forEach((element) => {
+    if (!element.matches('input, textarea')) {
+      element.removeAttribute('contenteditable');
+    }
+  });
+
+  const tabbableContainers = document.querySelectorAll('div[tabindex], section[tabindex], article[tabindex], table[tabindex], nav[tabindex]');
+  tabbableContainers.forEach((element) => {
+    const tabindexValue = Number(element.getAttribute('tabindex'));
+    if (!Number.isNaN(tabindexValue) && tabindexValue >= 0) {
+      element.removeAttribute('tabindex');
+    }
+  });
+}
+
+function setupFocusGuard() {
+  document.addEventListener('mousedown', (event) => {
+    const editableTarget = event.target.closest('input, textarea, select, [type="search"], [contenteditable="true"]');
+    if (editableTarget) return;
+
+    const activeElement = document.activeElement;
+    if (activeElement?.matches('input, textarea, select, [type="search"], [contenteditable="true"]')) {
+      activeElement.blur();
+    }
+  });
 }
